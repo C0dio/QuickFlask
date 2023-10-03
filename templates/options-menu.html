@@ -1,0 +1,20 @@
+{% if options is defined %}
+    <div class="w-100 mx-auto my-2 row row-cols-1 row-cols-md-3 g-2">
+        {% for option in options %}
+        <div class="col">
+            <div class="card bg-dark" style="cursor: grab;">
+                <div class="card-body p-0 text-center text-light">
+                    <i class="bi bi-{{option}}" style="font-size: 2rem"></i>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+{% else %}
+    <div class="card border-danger mx-auto my-2">
+        <div class="card-body text-danger">
+            <h5 class="card-title">No Options Defined</h5>
+            <p class="card-text">Options template called without providing an Options list</p>
+        </div>
+    </div>
+{% endif %}
