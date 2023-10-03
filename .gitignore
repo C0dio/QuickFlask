@@ -1,0 +1,7 @@
+# ignore the virtual environment
+# NB: run `python -m venv .venv` to recreate vm 
+.venv
+
+# python generated
+__pycache__
+*.pyc
