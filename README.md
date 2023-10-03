@@ -15,7 +15,7 @@ You will need to have the following packages installed;
 * Python 3.8+
 
 ## Quick Look
-<img src="https://github.com/C0dio/QuickFlask/assets/68840768/cc8c7e5c-029a-486f-a0c9-b41f36ad36f9" width="300" />
+<img src="https://github.com/C0dio/QuickFlask/assets/68840768/b962c7aa-8af6-4a32-8d8c-b34e20b18ca3" width="300" />
 
 ## Roadmap
 
