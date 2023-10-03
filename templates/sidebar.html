@@ -1,0 +1,56 @@
+<div class="d-flex flex-column flex-shrink-0 p-3 text-white bg-dark vh-100" style="width: 280px;">
+    <a href="/" class="d-flex align-items-center mb-3 mb-md-0 me-md-auto text-white text-decoration-none">
+        <i class="bi me-2" width="40" height="32"></i>
+        <span class="fs-4">Nodes</span>
+    </a>
+    <hr>
+    <ul class="nav nav-pills flex-column mb-auto">
+        <li class="nav-item">
+            <a href="#" class="nav-link active" aria-current="page">
+                <i class="bi bi-window-stack me-2" width="16" height="16"></i>
+                <span>Scenes</span>
+            </a>
+        </li>
+        <li>
+            <a href="#" class="nav-link text-white">
+                <i class="bi bi-card-text me-2" width="16" height="16"></i>
+                <span>Labels</span>
+                {% with options=['textarea-t', 'input-cursor-text'] %}
+                    {% include 'options-menu.html' %}
+                {% endwith %}
+            </a>
+        </li>
+        <li>
+            <a href="#" class="nav-link text-white">
+                <i class="bi bi-circle-square me-2" width="16" height="16"></i>
+                <span>Shapes</span>
+                {% with options=['circle', 'square', 'triangle'] %}
+                    {% include 'options-menu.html' %}
+                {% endwith %}
+            </a>
+        </li>
+        <li>
+            <a href="#" class="nav-link text-white">
+                <i class="bi bi-cloud-plus me-2" width="16" height="16"></i>
+                <span>Miscellaneous</span>
+            </a>
+        </li>
+    </ul>
+    <hr>
+    <div class="dropdown">
+        <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle"
+            id="profile-dropdown" data-bs-toggle="dropdown" aria-expanded="false">
+            <img src="https://github.com/c0dio.png" alt="" width="32" height="32" class="rounded-circle me-2">
+            <strong>C0dio</strong>
+        </a>
+        <ul class="dropdown-menu dropdown-menu-dark text-small shadow" aria-labelledby="profile-dropdown">
+            <li><a class="dropdown-item" href="#">New scene...</a></li>
+            <li><a class="dropdown-item disabled" href="#">Settings</a></li>
+            <li><a class="dropdown-item disabled" href="#">Profile</a></li>
+            <li>
+                <hr class="dropdown-divider">
+            </li>
+            <li><a class="dropdown-item disabled" href="#">Sign out</a></li>
+        </ul>
+    </div>
+</div>

@@ -1,1 +1,9 @@
-<h1>Hello, World!</h1>
+{% extends "head.html" %}
+{% block scripts %}
+    <script src="{{ url_for('static', filename='scripts/main.js') }}"></script>
+{% endblock %}
+{% block title %}Main{% endblock %}
+
+{% block content %}
+    <h1>Hello, world!</h1>
+{% endblock %}
