@@ -28,11 +28,12 @@ You will need to have the following packages installed;
 * The user is able to save the position and attributes of all the `Nodes` on the canvas into a `Scene`.
 * The user is able to save multiple different `Scenes`.
 * The user is able to switch between `Scenes` with minimal delay.
+* The user is able to delete `Scenes`.
+* The user is able to delete `Nodes`.
 
 ### Phase 3 - Quality of Life
 * The user is able to change additional attributes of the `Nodes` including colour, size and font.
-* The user is able to delete `Nodes`.
-* The user is able to delete `Scenes`.
+* The user is able to toggle 'autosave' so they don't have to keep clicking save.
 
 ### Phase 4 - Relationships
 * The user is able to connect `Nodes` together with a line.
