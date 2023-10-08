@@ -5,11 +5,39 @@
     </a>
     <hr>
     <ul class="nav nav-pills flex-column mb-auto">
-        <li class="nav-item">
-            <a href="#" class="nav-link active" aria-current="page">
-                <i class="bi bi-window-stack me-2" width="16" height="16"></i>
-                <span>Scenes</span>
-            </a>
+        <li class="accordion accordion-flush nav-item" id="accordionFlushExample">
+            <div class="accordion-item bg-dark">
+                <h2 class="accordion-header" id="flush-headingOne">
+                    <button class="accordion-button collapsed bg-dark text-white ps-3" type="button" data-bs-toggle="collapse" data-bs-target="#flush-collapseOne" aria-expanded="false" aria-controls="flush-collapseOne">
+                        <i class="bi bi-window-stack me-2 text-white" width="16" height="16"></i>
+                        <span>Scenes</span>
+                    </button>
+                </h2>
+                <div id="flush-collapseOne" class="accordion-collapse collapse" aria-labelledby="flush-headingOne" data-bs-parent="#accordionFlushExample">
+                    <div class="accordion-body p-0">
+                        <ul id="scene-list" class="list-group">
+                            {% for scene in scenes %}
+                            <li class="list-group-item saved-scene {% if loop.first %}active{% endif %}" aria-current="true">
+                                <i class="bi bi-window me-2 text-white" width="8" height="8"></i>
+                                <span>{{scene}}</span>
+                            </li>
+                            {% endfor %}
+                            <li id="new-scene" class="list-group-item" aria-current="true" style="border-top: 2px rgb(81, 81, 81) solid">
+                                <i class="bi bi-plus-lg me-2 text-white" width="8" height="8"></i>
+                                <span>New scene...</span>
+                            </li>
+                            <li id="save-scene" class="list-group-item" aria-current="true">
+                                <i class="bi bi-floppy me-2 text-white" width="8" height="8"></i>
+                                <span>Save scene...</span>
+                            </li>
+                            <li id="delete-scene" class="list-group-item" aria-current="true">
+                                <i class="bi bi-trash3 me-2 text-white" width="8" height="8"></i>
+                                <span>Delete scene...</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
         </li>
         <li>
             <a href="#" class="nav-link text-white">
@@ -37,20 +65,22 @@
         </li>
     </ul>
     <hr>
-    <div class="dropdown">
-        <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle"
-            id="profile-dropdown" data-bs-toggle="dropdown" aria-expanded="false">
-            <img src="https://github.com/c0dio.png" alt="" width="32" height="32" class="rounded-circle me-2">
-            <strong>C0dio</strong>
-        </a>
-        <ul class="dropdown-menu dropdown-menu-dark text-small shadow" aria-labelledby="profile-dropdown">
-            <li><a class="dropdown-item" href="#">New scene...</a></li>
-            <li><a class="dropdown-item disabled" href="#">Settings</a></li>
-            <li><a class="dropdown-item disabled" href="#">Profile</a></li>
-            <li>
-                <hr class="dropdown-divider">
-            </li>
-            <li><a class="dropdown-item disabled" href="#">Sign out</a></li>
-        </ul>
+    <div class="d-flex">
+        <div class="dropdown d-flex-inline">
+            <a href="#" class="d-flex align-items-center text-white text-decoration-none dropdown-toggle"
+                id="profile-dropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                <img src="https://github.com/c0dio.png" alt="" width="32" height="32" class="rounded-circle me-2">
+                <strong>C0dio</strong>
+            </a>
+            <ul class="dropdown-menu dropdown-menu-dark text-small shadow" aria-labelledby="profile-dropdown">
+                <li><a class="dropdown-item" href="#">New scene...</a></li>
+                <li><a class="dropdown-item disabled" href="#">Settings</a></li>
+                <li><a class="dropdown-item disabled" href="#">Profile</a></li>
+                <li>
+                    <hr class="dropdown-divider">
+                </li>
+                <li><a class="dropdown-item disabled" href="#">Sign out</a></li>
+            </ul>
+        </div>
     </div>
 </div>
