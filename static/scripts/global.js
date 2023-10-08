@@ -131,7 +131,7 @@ class NodeType {
 
     text(content) {
         this.text = content;
-        this.element = $(this.element).add(`<span>${content}</span>`);
+        this.element = $(this.element).append(`<span>${content}</span>`);
         return this;
     }
 
