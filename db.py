@@ -70,8 +70,12 @@ class NodesModel(db.Model):
     id: Mapped[int] = mapped_column(Integer, primary_key=True)
     ref_id: Mapped[str] = mapped_column(String(36), unique=True)
     type: Mapped[NodeTypes]
+    font: Mapped[str] = mapped_column(String)
+    size: Mapped[str] = mapped_column(String)
+    text: Mapped[str] = mapped_column(String)
     xpos: Mapped[int] = mapped_column(Integer)
     ypos: Mapped[int] = mapped_column(Integer)
+    color: Mapped[str] = mapped_column(String)
     # one scenes for many nodes relationship
     scene_id: Mapped[int] = mapped_column(ForeignKey("scenes.id"))
 

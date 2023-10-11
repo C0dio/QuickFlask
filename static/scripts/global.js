@@ -56,7 +56,6 @@ class Toast {
 
 
 class Request {
-    // TODO: Lots of duplicated code: DRY
     static post(endpoint, data, contentType='application/json') {
         return new Promise(function(resolve, _) {
             $.ajax({
@@ -109,17 +108,34 @@ class Request {
 class NodeType {
     static nodes = [];
 
-    constructor(tag, type=undefined, xpos=290, ypos=10) {
+    static isLabelNode(type) {
+        return type === 'textarea-t' || type === 'input-cursor-text';
+    }
+
+    constructor(
+        tag,
+        type=undefined,
+        xpos=290,
+        ypos=10,
+        text=undefined,
+        font = 'Arial',
+        size = 16,
+        color='#343a40',
+    ) {
         // class logic
         this.type = type;
-        this.text = undefined
+        this.text = text
         this.edit = false;
         this.draggable = false;
+        this.color = color;
+        this.font = font;
+        this.size = size;
 
         // element logic
         this.element = $(document.createElement(tag));
-        $(this.element).css({top: ypos, left: xpos, position:'absolute'});
+        $(this.element).css({top: ypos, left: xpos, position:'absolute', 'font-family':font});
         $(this.element).attr('is-node', true);
+        this._init_context_menu();
         if (type) {
             $(this.element).data('type', type);
             $(this.element).addClass(type);
@@ -129,16 +145,61 @@ class NodeType {
         NodeType.nodes.push(this);
     }
 
+    _init_context_menu() {
+        $(this.element).on('contextmenu', {instance: this}, function(event) {
+            event.preventDefault();
+            // assign colour functionality
+            $('#colorpicker').val(event.data.instance.color);
+            $('#colorpicker').off('input').on('input', {instance: event.data.instance}, function(event){
+                event.data.instance.setColor(event.target.value);
+            });
+
+            // assign size functionality
+            $('#node-size').val(event.data.instance.size);
+            $('#node-size').off('change').change({instance: event.data.instance}, function(event){
+                event.data.instance.setSize(event.target.value);
+            });
+
+            // assign font type functionality
+            if (NodeType.isLabelNode(event.data.instance.type)) {
+                $('#font-type-list').removeClass('d-none').addClass('d-flex');
+                $('#font-type').val('');
+                $('#font-type').attr('placeholder', event.data.instance.font);
+                $('#font-type').off('change').change({instance: event.data.instance}, function(event) {
+                    $(event.data.instance.element).css('font-family', event.target.value);
+                    event.data.instance.font = event.target.value;
+                });
+            } else {
+                $('#font-type-list').removeClass('d-flex').addClass('d-none');
+            }
+
+            // assign delete functionality
+            $('#delete-node').off('click').on('click', {instance: event.data.instance}, function(event){
+                $(event.data.instance.element).remove();
+                $('#contextmenu').removeClass('show');
+
+                // remove instance from array
+                NodeType.nodes = NodeType.nodes.filter(function(e){
+                    return e !== event.data.instance;
+                 });
+            });
+
+            // move the menu & reveal it
+            $('#contextmenu').css({top: event.pageY, left: event.pageX});
+            $('#contextmenu').addClass('show');
+        });
+    }
+
     text(content) {
         this.text = content;
-        this.element = $(this.element).append(`<span>${content}</span>`);
+        this.element = $(this.element).html(content);
         return this;
     }
 
     drag() {
         this.draggable = true;
         $(this.element).addClass('draggable');
-        $(this.element).draggable();
+        $(this.element).draggable({containment: 'parent'});
         return this;
     }
 
@@ -155,27 +216,74 @@ class NodeType {
     build() {
         throw new Error('Method Not Implemented');
     }
+
+    setColor(value) {
+        throw new Error('Method Not Implemented');
+    }
+
+    setSize(value) {
+        throw new Error('Method Not Implemented');
+    }
 }
 
 class ShapeNode extends NodeType {
     build() {
         $(this.element).addClass('shape');
+        this.setSize(100);
+        this.setColor(this.color);
         this.drag().add();
+    }
+    
+    setColor(value) {
+        this.color = value;
+        $(this.element).css('background-color', value);
+    }
+
+    setSize(value) {
+        this.size = value;
+        $(this.element).width(value).height(value);
+    }
+}
+
+class TriangleNode extends ShapeNode {
+    setColor(value) {
+        this.color = value;
+        $(this.element).css('border-bottom', `${this.size}px solid ${value}`);
+    }
+
+    setSize(value) {
+        this.size = value;
+        $(this.element).css('border', `${value / 2}px solid transparent`);
+        $(this.element).css('border-bottom', `${value}px solid ${this.color}`);
     }
 }
 
 class LabelNode extends NodeType {
     build(content='Placeholder', edit=true) {
+        $(this.element).addClass('label');
+        this.setSize(this.size);
+        this.setColor(this.color);
         super.text(content).drag().add();
 
         if (edit) {
             this.editable();
         }
     }
+
+    setColor(value) {
+        this.color = value;
+        $(this.element).css('color', value);
+    }
+
+    setSize(value) {
+        this.size = value;
+        $(this.element).css('font-size', `${value}px`);
+    }
 }
 
 
 class SceneManager {
+    static autosave = false;
     static template = '\
         <li class="list-group-item saved-scene" aria-current="true"> \
             <i class="bi bi-window me-2 text-white" width="8" height="8"></i> \
@@ -245,11 +353,39 @@ class SceneManager {
             // load the nodes onto the scene
             const nodes = JSON.parse(response['nodes']);
             nodes.forEach(node => {
-                // TODO: pass label data here to avoid hard-coding
-                if (node.type === 'textarea-t' || node.type === 'input-cursor-text') {
-                    new LabelNode('p', node.type, node.ypos, node.xpos).build();
+                if (NodeType.isLabelNode(node.type)) {
+                    new LabelNode(
+                        'h1',
+                        node.type,
+                        node.ypos,
+                        node.xpos,
+                        node.text,
+                        node.font,
+                        node.size,
+                        node.color
+                    ).build(node.text);
+                } else if (node.type === 'triangle') {
+                    new TriangleNode(
+                        'span',
+                        node.type,
+                        node.ypos,
+                        node.xpos,
+                        node.text,
+                        node.font,
+                        node.size,
+                        node.color
+                    ).build();
                 } else {
-                    new ShapeNode('span', node.type, node.ypos, node.xpos).build();
+                    new ShapeNode(
+                        'span',
+                        node.type,
+                        node.ypos,
+                        node.xpos,
+                        node.text,
+                        node.font,
+                        node.size,
+                        node.color
+                    ).build();
                 }
             });
         });
@@ -261,33 +397,24 @@ class SceneManager {
 // Node Options
 //
 
-$('.draggable').draggable({
-    containment: 'parent',
-    start: (event, ui) => {},
-    drag : (event, ui) => {},
-    stop : (event, ui) => {},
-});
-
-
 $('.option-card').click((event) => {
     // get the option type
-    // TODO: have option-type field as generic type and add a detailed type field for specifics
-    const optionType = $(event.target).data('option-type');
+    let optionType = $(event.target).data('option-type');
     if (optionType == null) {
-        $($(event.target).children('i')[0]).data('option-type');
+        optionType = $($(event.target).children('i')[0]).data('option-type');
     }
-    // TODO: Shouldn't need to check three times to see if its null
-    if (optionType == null) return;
 
     // check option type
-    // TODO: pass label data here to avoid hard-coding
-    if (optionType == 'textarea-t' || optionType == 'input-cursor-text') {
-        new LabelNode('p', optionType).build();
-        return;
+    if (NodeType.isLabelNode(optionType)) {
+        return new LabelNode('h1', optionType).build();
+    }
+
+    if (optionType === 'triangle') {
+        return new TriangleNode('span', optionType).build();
     }
 
     // create and build a shape node
-    new ShapeNode('span', optionType).build();
+    return new ShapeNode('span', optionType).build();
 });
 
 
@@ -296,6 +423,11 @@ $('.option-card').click((event) => {
 //
 
 $(document).on('click', '.saved-scene', function() {
+    // save the existing scene if enabled
+    if (SceneManager.autosave) {
+        $('#save-scene').click();
+    }
+
     const scene = SceneManager.getName($(this));
     SceneManager.activate(scene);
     SceneManager.load(SceneManager.getActiveSceneName());
@@ -303,6 +435,11 @@ $(document).on('click', '.saved-scene', function() {
 
 
 $('#new-scene').click(() => {
+    // save the existing scene if enabled
+    if (SceneManager.autosave) {
+        $('#save-scene').click();
+    }
+
     // add a new scene to sidebar
     const scene_name = SceneManager.add();
     
@@ -317,10 +454,34 @@ $('#new-scene').click(() => {
 });
 
 
-$('#save-scene').click(() => {
+$('#save-scene').click(event => {
+    // no scenes to save
+    if ($('.saved-scene').length < 1) {
+        return;
+    }
+
+    // update the text values
+    NodeType.nodes.forEach(n => {
+        n.text = $(n.element).html();
+
+        // remove blank label nodes
+        if (n instanceof LabelNode && n.text.length <  1) {
+            $(n.element).remove();
+
+            // remove instance from array
+            NodeType.nodes = NodeType.nodes.filter(function(e){
+                return e !== n;
+            });
+        }
+    });
+
     // get all the nodes on the scene & convert to objects
     const nodes = NodeType.nodes.map(node => ({
         type: node.type,
+        font: node.font,
+        size: node.size,
+        text: node.text,
+        color: node.color,
         xpos: $(node.element).position().top,
         ypos: $(node.element).position().left,
     }));
@@ -338,9 +499,18 @@ $('#save-scene').click(() => {
 });
 
 
-$('#delete-scene').click(event => {
-    // TODO: Add confirmation modal
+$('#delete-scene').click(() => {
+    // no scenes to delete
+    if ($('.saved-scene').length < 1) {
+        return;
+    }
 
+    // Show confirmation modal
+    $('#confirmation-modal').modal('show');
+});
+
+
+$('#delete-scene-confirm').click(() => {
     // get scene name
     const scene_name = SceneManager.getActiveSceneName();
 
@@ -349,8 +519,9 @@ $('#delete-scene').click(event => {
         new Toast('Action Completed', response).show();
         SceneManager.delete();
     });
-});
 
+    $('#confirmation-modal').modal('hide');
+});
 
 //
 // Page Options
@@ -362,7 +533,6 @@ $(document).ready(function() {
         return new bootstrap.Tooltip(tooltip);
     });
 
-
     // check whether there are scenes to load
     if ($('.saved-scene').length < 1) {
         return;
@@ -371,4 +541,21 @@ $(document).ready(function() {
     // load the first scene
     const scene_name = SceneManager.getActiveSceneName();
     SceneManager.load(scene_name);
+});
+
+
+$(document).click(function(event) {
+    // hide the context menu if user clicks outside of it
+    if (!$(event.target).parents('#contextmenu').length
+        && event.target.id !== 'contextmenu') {
+        $('#contextmenu').removeClass('show');
+    }
+});
+
+
+$('#autosave').click(function() {
+    SceneManager.autosave = $(this).prop('checked');
+    if (SceneManager.autosave) {
+        $('#save-scene').click();
+    }
 });
