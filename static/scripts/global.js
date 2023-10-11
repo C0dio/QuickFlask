@@ -108,6 +108,10 @@ class Request {
 class NodeType {
     static nodes = [];
 
+    static isLabelNode(type) {
+        return type === 'textarea-t' || type === 'input-cursor-text';
+    }
+
     constructor(
         tag,
         type=undefined,
@@ -157,7 +161,7 @@ class NodeType {
             });
 
             // assign font type functionality
-            if (event.data.instance.type === 'textarea-t' || event.data.instance.type === 'input-cursor-text') {
+            if (NodeType.isLabelNode(event.data.instance.type)) {
                 $('#font-type-list').removeClass('d-none').addClass('d-flex');
                 $('#font-type').val('');
                 $('#font-type').attr('placeholder', event.data.instance.font);
@@ -349,8 +353,7 @@ class SceneManager {
             // load the nodes onto the scene
             const nodes = JSON.parse(response['nodes']);
             nodes.forEach(node => {
-                // TODO: Make a static factory function to return the correct type - EMUM?
-                if (node.type === 'textarea-t' || node.type === 'input-cursor-text') {
+                if (NodeType.isLabelNode(node.type)) {
                     new LabelNode(
                         'h1',
                         node.type,
@@ -396,16 +399,13 @@ class SceneManager {
 
 $('.option-card').click((event) => {
     // get the option type
-    const optionType = $(event.target).data('option-type');
+    let optionType = $(event.target).data('option-type');
     if (optionType == null) {
-        $($(event.target).children('i')[0]).data('option-type');
+        optionType = $($(event.target).children('i')[0]).data('option-type');
     }
-    // TODO: Shouldn't need to check three times to see if its null
-    if (optionType == null) return;
 
     // check option type
-    // TODO: pass label data here to avoid hard-coding
-    if (optionType == 'textarea-t' || optionType == 'input-cursor-text') {
+    if (NodeType.isLabelNode(optionType)) {
         return new LabelNode('h1', optionType).build();
     }
 
