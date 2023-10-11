@@ -28,8 +28,12 @@ def load_scene(name):
             yield {
                 'id': node.ref_id,
                 'type': node.type.value,
+                'font': node.font,
+                'size': node.size,
+                'text': node.text,
                 'xpos': node.xpos,
-                'ypos': node.ypos
+                'ypos': node.ypos,
+                'color': node.color,
             }
     
     # return the nodes of the scene
@@ -50,28 +54,37 @@ def save_scene():
         db_scene = ScenesModel(name=scene_name)
         db.add(db_scene)
     
+    # remove all the nodes in the scene to handle duplicate or deleted nodes
+    db_scene.nodes = []
+
     # if no nodes are attached then just create the scene
     if not nodes:
         return 'Created Scene', 201
 
-    # remove all the nodes in the scene to handle duplicate or deleted nodes
-    db_scene.nodes = []
 
     # create and add the nodes to the scene
     for node in nodes:
         # parse the node
         node_id =   node.get('ref_id', str(uuid4()))
         node_type = node.get('type', 'circle')
+        node_font = node.get('font', 'Arial')
+        node_size = node.get('size', 16)
+        node_text = node.get('text', '')
         node_xpos = node.get('xpos', 0)
         node_ypos = node.get('ypos', 0)
+        node_color = node.get('color', '#343a40')
         # only add new nodes
         db_node = db.get_by_field(NodesModel, 'ref_id', node_id)
         if not db_node:
             db_node = NodesModel(
                 ref_id=node_id,
                 type=NodeTypes(node_type),
+                font=node_font,
+                size=node_size,
+                text=node_text,
                 xpos=node_xpos,
                 ypos=node_ypos,
+                color=node_color,
                 scene_id=db_scene.id
             )
             db.add(db_node)

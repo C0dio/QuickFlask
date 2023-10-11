@@ -12,14 +12,19 @@
     --active: #2b2d4a;
 }
 
+#delete-node:hover {
+    background-color: var(--bs-danger);
+    transition: 0.4s;
+}
+
 .draggable {
     display: block;
-    width: 100px;
-    height: 100px;
 }
 
 .shape {
     background-color: var(--bs-gray-dark);
+    width: 100px;
+    height: 100px;
 }
 
 .square {
