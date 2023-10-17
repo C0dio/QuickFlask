@@ -16,7 +16,7 @@ You will need to have the following packages installed;
 * Python: 3.8+
 
 ## Quick Look
-<img src="https://github.com/C0dio/QuickFlask/assets/68840768/b962c7aa-8af6-4a32-8d8c-b34e20b18ca3" width="300" />
+<img src="https://github.com/C0dio/QuickFlask/assets/68840768/7539cc2f-9273-41c6-a8a2-5bd1f3381a79" width="300" />
 
 ## Roadmap
 
@@ -42,4 +42,3 @@ You will need to have the following packages installed;
 
 ### Phase 5 - Demo
 * Anyone who clones the project will have access to a `Sandbox Scene` where they can play around with the application.
-* Anyone who clones the project will have access to a `Demo Scene` where a pre-made `Scene` explains the very basics of Graph Theory.
