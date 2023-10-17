@@ -34,6 +34,7 @@ def load_scene(name):
                 'xpos': node.xpos,
                 'ypos': node.ypos,
                 'color': node.color,
+                'rotation': node.rotation,
             }
     
     # return the nodes of the scene
@@ -73,6 +74,7 @@ def save_scene():
         node_xpos = node.get('xpos', 0)
         node_ypos = node.get('ypos', 0)
         node_color = node.get('color', '#343a40')
+        node_rotation = node.get('rotation', 0)
         # only add new nodes
         db_node = db.get_by_field(NodesModel, 'ref_id', node_id)
         if not db_node:
@@ -85,6 +87,7 @@ def save_scene():
                 xpos=node_xpos,
                 ypos=node_ypos,
                 color=node_color,
+                rotation=node_rotation,
                 scene_id=db_scene.id
             )
             db.add(db_node)

@@ -61,7 +61,7 @@ class NodeTypes(enum.Enum):
     TRIANGLE = "triangle"
 
     # misc types
-    ARROW = ""
+    ARROW = "arrows"
 
 
 class NodesModel(db.Model):
@@ -76,6 +76,7 @@ class NodesModel(db.Model):
     xpos: Mapped[int] = mapped_column(Integer)
     ypos: Mapped[int] = mapped_column(Integer)
     color: Mapped[str] = mapped_column(String)
+    rotation: Mapped[int] = mapped_column(Integer)
     # one scenes for many nodes relationship
     scene_id: Mapped[int] = mapped_column(ForeignKey("scenes.id"))
 
