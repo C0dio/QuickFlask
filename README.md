@@ -5,14 +5,15 @@ This is a little project where I can explore Draggable UI and further improve my
 Clone the repository and run the Flask application;
 
 ```shell
-# note you don't need to specify the app name
+# NB: you don't need to specify the app name
 flask run
 ```
 
 ## Dependencies
 You will need to have the following packages installed;
-* Flask,
-* Python 3.8+
+* Flask: 3.0.0+,
+* Flask-SQLAlchemy: 3.1.1+,
+* Python: 3.8+
 
 ## Quick Look
 <img src="https://github.com/C0dio/QuickFlask/assets/68840768/b962c7aa-8af6-4a32-8d8c-b34e20b18ca3" width="300" />
@@ -36,9 +37,9 @@ You will need to have the following packages installed;
 * The user is able to toggle 'autosave' so they don't have to keep clicking save.
 
 ### Phase 4 - Relationships
-* The user is able to connect `Nodes` together with a line.
-* The user is able to connect `Nodes` together with a directed line.
+* The user is able to create a line.
+* The user is able to rotate Nodes on a scene.
 
 ### Phase 5 - Demo
-Anyone who clones the project will have access to a `Sandbox Scene` where they can play around with the application.
-Anyone who clones the project will have access to a `Demo Scene` where a pre-made `Scene` explains the very basics of Graph Theory.
+* Anyone who clones the project will have access to a `Sandbox Scene` where they can play around with the application.
+* Anyone who clones the project will have access to a `Demo Scene` where a pre-made `Scene` explains the very basics of Graph Theory.

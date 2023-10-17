@@ -112,15 +112,24 @@ class NodeType {
         return type === 'textarea-t' || type === 'input-cursor-text';
     }
 
+    static isRelationshipNode(type) {
+        return type === 'arrow-right' || type === 'arrows';
+    }
+
+    static isTriangleNode(type) {
+        return type === 'triangle';
+    }
+
     constructor(
         tag,
         type=undefined,
         xpos=290,
         ypos=10,
         text=undefined,
-        font = 'Arial',
-        size = 16,
+        font='Arial',
+        size=16,
         color='#343a40',
+        rotation = 0
     ) {
         // class logic
         this.type = type;
@@ -130,6 +139,7 @@ class NodeType {
         this.color = color;
         this.font = font;
         this.size = size;
+        this.rotation = rotation;
 
         // element logic
         this.element = $(document.createElement(tag));
@@ -158,6 +168,12 @@ class NodeType {
             $('#node-size').val(event.data.instance.size);
             $('#node-size').off('change').change({instance: event.data.instance}, function(event){
                 event.data.instance.setSize(event.target.value);
+            });
+
+            // assign rotation functionality
+            $('#node-rotation').val(event.data.instance.rotation);
+            $('#node-rotation').off('change').change({instance: event.data.instance}, function(event){
+                event.data.instance.setRotation(event.target.value);
             });
 
             // assign font type functionality
@@ -211,6 +227,7 @@ class NodeType {
     editable() {
         this.edit = true;
         $(this.element).prop('contenteditable', true);
+        return this;
     }
 
     build() {
@@ -218,30 +235,31 @@ class NodeType {
     }
 
     setColor(value) {
-        throw new Error('Method Not Implemented');
+        this.color = value;
+        $(this.element).css('background-color', value);
+        return this;
+    }
+    
+    setSize(value) {
+        this.size = value;
+        $(this.element).width(value).height(value);
+        return this;
     }
 
-    setSize(value) {
-        throw new Error('Method Not Implemented');
+    setRotation(value) {
+        this.rotation = value;
+        $(this.element).css({'transform' : 'rotate('+ value +'deg)'});
+        return this;
     }
 }
 
 class ShapeNode extends NodeType {
     build() {
         $(this.element).addClass('shape');
-        this.setSize(100);
+        this.setSize(this.size);
         this.setColor(this.color);
         this.drag().add();
-    }
-    
-    setColor(value) {
-        this.color = value;
-        $(this.element).css('background-color', value);
-    }
-
-    setSize(value) {
-        this.size = value;
-        $(this.element).width(value).height(value);
+        this.setRotation(this.rotation);
     }
 }
 
@@ -249,12 +267,14 @@ class TriangleNode extends ShapeNode {
     setColor(value) {
         this.color = value;
         $(this.element).css('border-bottom', `${this.size}px solid ${value}`);
+        return this;
     }
 
     setSize(value) {
         this.size = value;
         $(this.element).css('border', `${value / 2}px solid transparent`);
         $(this.element).css('border-bottom', `${value}px solid ${this.color}`);
+        return this;
     }
 }
 
@@ -264,6 +284,7 @@ class LabelNode extends NodeType {
         this.setSize(this.size);
         this.setColor(this.color);
         super.text(content).drag().add();
+        this.setRotation(this.rotation);
 
         if (edit) {
             this.editable();
@@ -273,11 +294,30 @@ class LabelNode extends NodeType {
     setColor(value) {
         this.color = value;
         $(this.element).css('color', value);
+        return this;
     }
 
     setSize(value) {
         this.size = value;
         $(this.element).css('font-size', `${value}px`);
+        return this;
+    }
+}
+
+class RelationshipNode extends NodeType {
+    build() {
+        $(this.element).addClass('relationship');
+        $(this.element).height(3);
+        this.setSize(this.size);
+        this.setColor(this.color);
+        this.setRotation(this.rotation);
+        this.drag().add();
+    }
+
+    setSize(value) {
+        this.size = value;
+        $(this.element).width(this.size);
+        return this;
     }
 }
 
@@ -353,6 +393,7 @@ class SceneManager {
             // load the nodes onto the scene
             const nodes = JSON.parse(response['nodes']);
             nodes.forEach(node => {
+                // TODO: Factory would be better
                 if (NodeType.isLabelNode(node.type)) {
                     new LabelNode(
                         'h1',
@@ -362,9 +403,10 @@ class SceneManager {
                         node.text,
                         node.font,
                         node.size,
-                        node.color
+                        node.color,
+                        node.rotation,
                     ).build(node.text);
-                } else if (node.type === 'triangle') {
+                } else if (NodeType.isTriangleNode(node.type)) {
                     new TriangleNode(
                         'span',
                         node.type,
@@ -373,7 +415,20 @@ class SceneManager {
                         node.text,
                         node.font,
                         node.size,
-                        node.color
+                        node.color,
+                        node.rotation,
+                    ).build();
+                } else if (NodeType.isRelationshipNode(node.type)) {
+                    new RelationshipNode(
+                        'span',
+                        node.type,
+                        node.ypos,
+                        node.xpos,
+                        node.text,
+                        node.font,
+                        node.size,
+                        node.color,
+                        node.rotation,
                     ).build();
                 } else {
                     new ShapeNode(
@@ -384,7 +439,8 @@ class SceneManager {
                         node.text,
                         node.font,
                         node.size,
-                        node.color
+                        node.color,
+                        node.rotation,
                     ).build();
                 }
             });
@@ -404,17 +460,23 @@ $('.option-card').click((event) => {
         optionType = $($(event.target).children('i')[0]).data('option-type');
     }
 
+    //
     // check option type
+    //
     if (NodeType.isLabelNode(optionType)) {
         return new LabelNode('h1', optionType).build();
     }
 
-    if (optionType === 'triangle') {
-        return new TriangleNode('span', optionType).build();
+    if (NodeType.isRelationshipNode(optionType)) {
+        return new RelationshipNode('i', optionType).setSize(100).build();
+    }
+
+    if (NodeType.isTriangleNode(optionType)) {
+        return new TriangleNode('span', optionType).setSize(100).build();
     }
 
     // create and build a shape node
-    return new ShapeNode('span', optionType).build();
+    return new ShapeNode('span', optionType).setSize(100).build();
 });
 
 
@@ -482,6 +544,7 @@ $('#save-scene').click(event => {
         size: node.size,
         text: node.text,
         color: node.color,
+        rotation: node.rotation,
         xpos: $(node.element).position().top,
         ypos: $(node.element).position().left,
     }));
@@ -533,6 +596,13 @@ $(document).ready(function() {
         return new bootstrap.Tooltip(tooltip);
     });
 
+    // set up autosave
+    const autosave = sessionStorage.getItem('autosave') === 'true'; 
+    if (autosave) {
+        SceneManager.autosave = autosave;
+        $('#autosave').prop('checked', autosave);
+    }
+
     // check whether there are scenes to load
     if ($('.saved-scene').length < 1) {
         return;
@@ -558,4 +628,6 @@ $('#autosave').click(function() {
     if (SceneManager.autosave) {
         $('#save-scene').click();
     }
+
+    sessionStorage.setItem('autosave', SceneManager.autosave);
 });

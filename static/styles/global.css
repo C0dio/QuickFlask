@@ -23,8 +23,6 @@
 
 .shape {
     background-color: var(--bs-gray-dark);
-    width: 100px;
-    height: 100px;
 }
 
 .square {

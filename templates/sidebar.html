@@ -60,7 +60,10 @@
         <li>
             <a href="#" class="nav-link text-white">
                 <i class="bi bi-cloud-plus me-2" width="16" height="16"></i>
-                <span>Miscellaneous</span>
+                <span>Relationships</span>
+                {% with options=['arrows'] %}
+                    {% include 'options-menu.html' %}
+                {% endwith %}
             </a>
         </li>
     </ul>
